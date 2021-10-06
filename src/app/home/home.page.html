@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Background Audio App
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Background audio</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <div class="row">
+      <div class="col">
+        <ion-button (click)="play()">PLAY</ion-button>
+        <ion-button (click)="pause()">PAUSE</ion-button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <ion-button (click)="volumeUp()">VOLUME +</ion-button>
+        <ion-button (click)="volumeDown()">VOLUME -</ion-button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <ion-button (click)="seek()">SEEK</ion-button>
+        <ion-button (click)="duration()">DURATION</ion-button>
+        <ion-button (click)="state()">STATE</ion-button>
+        <ion-button (click)="playing()">playing</ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

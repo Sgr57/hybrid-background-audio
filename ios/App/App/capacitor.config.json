@@ -1,0 +1,6 @@
+{
+	"appId": "io.hybrid.background_audio",
+	"appName": "hybrid-background-audio",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}

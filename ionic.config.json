@@ -1,0 +1,7 @@
+{
+  "name": "hybrid-background-audio",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
