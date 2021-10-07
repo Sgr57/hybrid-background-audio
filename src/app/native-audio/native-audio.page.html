@@ -30,9 +30,10 @@
     </div>
     <div class="row">
       <div class="col">
-        <ion-button (click)="seek()">SEEK</ion-button>
-        <ion-button (click)="duration()">DURATION</ion-button>
-        <ion-button (click)="goto(10)">GOTO 10 s</ion-button>
+<!--        <ion-button (click)="seek()">SEEK</ion-button>-->
+<!--        <ion-button (click)="updateDuration()">DURATION</ion-button>-->
+        <ion-button (click)="skipForward()"> + {{this.skipTime}} </ion-button>
+        <ion-button (click)="skipBackward()"> - {{this.skipTime}} </ion-button>
       </div>
     </div>
   </div>
