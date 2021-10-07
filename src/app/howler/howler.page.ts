@@ -33,8 +33,6 @@ export class HowlerPage implements OnInit {
     }).catch(err => {
       console.log('CapacitorMusicControls.create - err: ', err);
     });
-
-
   }
 
   handleControlsEvent(action) {
