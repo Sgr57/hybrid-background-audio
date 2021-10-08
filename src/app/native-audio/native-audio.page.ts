@@ -12,10 +12,11 @@ const { CapacitorMusicControls } = Plugins;
 })
 export class NativeAudioPage implements OnInit {
 
-  // audioUrl = 'https://www.bensound.com/bensound-music/bensound-ukulele.mp3';
+  audioUrlRemote = 'https://www.bensound.com/bensound-music/bensound-ukulele.mp3';
   audioUrl = 'public/assets/ukulele.mp3';
   assetId = 'ukulele';
   volume: number = 1.0;
+  isInitializated = false;
   isPlaying = false;
   isStarted = false;
   duration: number = 0;
@@ -30,7 +31,19 @@ export class NativeAudioPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.start();
+  }
+
+  startRemote() {
+    if (this.platform.is('cordova')) {
+      NativeAudio.preload({
+        assetId: this.assetId,
+        assetPath: this.audioUrlRemote,
+        isUrl: true,
+        audioChannelNum: 1,
+        volume: this.volume,
+      });
+      this.isInitializated = true;
+    }
   }
 
   start() {
@@ -42,6 +55,7 @@ export class NativeAudioPage implements OnInit {
         audioChannelNum: 1,
         volume: this.volume,
       });
+      this.isInitializated = true;
     }
   }
 
