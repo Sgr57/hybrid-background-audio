@@ -1,9 +1,6 @@
 import {Component, NgZone, OnInit} from '@angular/core';
 import {Platform} from "@ionic/angular";
 import {NativeAudio} from "@capacitor-community/native-audio";
-import {BackgroundMode} from "@ionic-native/background-mode/ngx";
-import { Plugins } from '@capacitor/core';
-const { CapacitorMusicControls } = Plugins;
 
 @Component({
   selector: 'app-native-audio',
@@ -15,7 +12,6 @@ export class NativeAudioPage implements OnInit {
   audioUrlRemote = 'https://www.bensound.com/bensound-music/bensound-ukulele.mp3';
   audioUrl = 'public/assets/ukulele.mp3';
   assetId = 'ukulele';
-  volume: number = 1.0;
   isInitializated = false;
   isPlaying = false;
   isStarted = false;
@@ -31,6 +27,7 @@ export class NativeAudioPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.initEventsListener();
   }
 
   startRemote() {
@@ -40,9 +37,14 @@ export class NativeAudioPage implements OnInit {
         assetPath: this.audioUrlRemote,
         isUrl: true,
         audioChannelNum: 1,
-        volume: this.volume,
+        volume: 1.0,
+        trackName: 'Ukulele',
+        artist: 'artist',
+        album: 'album',
+        cover: 'https://www.macitynet.it/wp-content/uploads/2017/05/Yuri-Di-Prodo-2017-Macitynet-004-Ukulele-Andoer.jpg',
+      }).then(() => {
+        this.isInitializated = true;
       });
-      this.isInitializated = true;
     }
   }
 
@@ -53,9 +55,14 @@ export class NativeAudioPage implements OnInit {
         assetPath: this.audioUrl,
         isUrl: false,
         audioChannelNum: 1,
-        volume: this.volume,
+        volume: 1.0,
+        trackName: 'Ukulele',
+        artist: 'artist',
+        album: 'album',
+        cover: 'https://www.macitynet.it/wp-content/uploads/2017/05/Yuri-Di-Prodo-2017-Macitynet-004-Ukulele-Andoer.jpg',
+      }).then(() => {
+        this.isInitializated = true;
       });
-      this.isInitializated = true;
     }
   }
 
@@ -65,16 +72,11 @@ export class NativeAudioPage implements OnInit {
       time
     }).then(() => {
       console.log('play - success');
+      this.isPlaying = true;
+      this.isStarted = true;
     }).catch((err) => {
       console.log('play - err: ', err);
     });
-
-    this.duration = await this.updateDuration();
-    this.startControls();
-    this.startElapsedMonitor();
-
-    this.isPlaying = true;
-    this.isStarted = true;
   }
 
   pause() {
@@ -82,11 +84,10 @@ export class NativeAudioPage implements OnInit {
       assetId: this.assetId,
     }).then(() => {
       console.log('pause - success');
+      this.isPlaying = false;
     }).catch((err) => {
       console.log('pause - err: ', err);
     });
-    this.stopElapsedMonitor();
-    this.isPlaying = false;
   }
 
   resume() {
@@ -94,11 +95,10 @@ export class NativeAudioPage implements OnInit {
       assetId: this.assetId,
     }).then(() => {
       console.log('resume - success');
+      this.isPlaying = true;
     }).catch((err) => {
       console.log('resume - err: ', err);
     });
-    this.startElapsedMonitor();
-    this.isPlaying = true;
   }
 
   stop() {
@@ -106,49 +106,58 @@ export class NativeAudioPage implements OnInit {
       assetId: this.assetId,
     }).then(() => {
       console.log('stop - success');
+      this.isPlaying = false;
+      this.isStarted = false;
     }).catch((err) => {
       console.log('stop - err: ', err);
     });
-    this.stopElapsedMonitor();
-    this.isPlaying = false;
-    this.isStarted = false;
   }
 
   volumeUp() {
-    let volume = Math.round((this.volume + 0.1) * 10) / 10;
-    if (volume > 1.0) volume = 1.0;
-    NativeAudio.setVolume({
-      assetId: this.assetId,
-      volume
-    }).then(() => {
-      console.log('setVolume - success');
+    NativeAudio.getVolume({ assetId: this.assetId}).then((res) => {
+      console.log('getVolume - success - res: ', res);
+      const currentVolume = res.volume;
+      const targetVolume = currentVolume + 0.1;
+      NativeAudio.setVolume({
+        assetId: this.assetId,
+        volume: targetVolume
+      }).then(() => {
+        console.log('setVolume - success');
+      }).catch((err) => {
+        console.log('setVolume - err: ', err);
+      });
     }).catch((err) => {
-      console.log('setVolume - err: ', err);
+      console.log('getVolume - err: ', err);
     });
-    this.volume = volume;
   }
 
   volumeDown() {
-    let volume = Math.round((this.volume - 0.1) * 10) / 10;
-    if (volume < 0) volume = 0;
-    NativeAudio.setVolume({
-      assetId: this.assetId,
-      volume
-    }).then(() => {
-      console.log('setVolume - success');
+    NativeAudio.getVolume({ assetId: this.assetId}).then((res) => {
+      console.log('getVolume - success - res: ', res);
+      const currentVolume = res.volume;
+      const targetVolume = currentVolume - 0.1;
+      NativeAudio.setVolume({
+        assetId: this.assetId,
+        volume: targetVolume
+      }).then(() => {
+        console.log('setVolume - success');
+      }).catch((err) => {
+        console.log('setVolume - err: ', err);
+      });
     }).catch((err) => {
-      console.log('setVolume - err: ', err);
+      console.log('getVolume - err: ', err);
     });
-    this.volume = volume;
   }
 
-  seek() {
+  currentTime() {
     return NativeAudio.getCurrentTime({
       assetId: this.assetId,
-    }).then(result => {
-      console.log('seek: ', result.currentTime);
-      this.elapsed = result.currentTime;
-      return result.currentTime;
+    }).then(res => {
+      console.log('getCurrentTime - success - res: ', res);
+      const currentTime = res.time;
+      return currentTime;
+    }).catch(err => {
+      console.log('getCurrentTime - err: ', err);
     });
   }
 
@@ -163,158 +172,77 @@ export class NativeAudioPage implements OnInit {
   }
 
   skipForward() {
-    this.stop();
-    let time = this.elapsed + this.skipTime;
-    if (time >= this.duration) time = this.duration;
-    this.play(time);
+    NativeAudio.getCurrentTime({
+      assetId: this.assetId,
+    }).then(res => {
+      console.log('getCurrentTime - success - res: ', res);
+      const currentTime = res.time;
+      const targetTime = currentTime + this.skipTime;
+      NativeAudio.setCurrentTime({
+        assetId: this.assetId,
+        time: targetTime,
+      }).then(() => {
+        console.log('setCurrentTime - success');
+      }).catch(err => {
+        console.log('setCurrentTime - err: ', err);
+      })
+    }).catch(err => {
+      console.log('getCurrentTime - err: ', err);
+    });
   }
 
   skipBackward() {
-    this.stop();
-    let time = this.elapsed - this.skipTime;
-    if (time >= this.duration) time = this.duration;
-    this.play(time);
-  }
-
-
-  startControls() {
-    const options = {
-      track       : 'Time is Running Out',		// optional, default : ''
-      artist      : 'Muse',						// optional, default : ''
-      album       : 'Absolution',     // optional, default: ''
-      cover       : 'https://upload.wikimedia.org/wikipedia/en/b/b4/Muse_-_Absolution_Cover_UK.jpg',		// optional, default : nothing
-      // cover can be a local path (use fullpath 'file:///storage/emulated/...', or only 'my_image.jpg' if my_image.jpg is in the www folder of your app)
-      //			 or a remote url ('http://...', 'https://...', 'ftp://...')
-
-      // hide previous/next/close buttons:
-      hasPrev   : false,		// show previous button, optional, default: true
-      hasNext   : false,		// show next button, optional, default: true
-      hasClose  : true,		// show close button, optional, default: false
-
-      // iOS only, optional
-      duration : this.duration, // optional, default: 0
-      elapsed : this.elapsed, // optional, default: 0
-      hasSkipForward : true, //optional, default: false. true value overrides hasNext.
-      hasSkipBackward : true, //optional, default: false. true value overrides hasPrev.
-      skipForwardInterval : this.skipTime, //optional. default: 15.
-      skipBackwardInterval : this.skipTime, //optional. default: 15.
-      hasScrubbing : false, //optional. default to false. Enable scrubbing from control center progress bar
-
-      // Android only, optional
-      isPlaying   : this.isPlaying,							// optional, default : true
-      dismissable : true,							// optional, default : false
-      // text displayed in the status bar when the notification (and the ticker) are updated
-      ticker	  : 'Now playing "Time is Running Out"',
-      //All icons default to their built-in android equivalents
-      //The supplied drawable name, e.g. 'media_play', is the name of a drawable found under android/res/drawable* folders
-      playIcon: 'media_play',
-      pauseIcon: 'media_pause',
-      prevIcon: 'media_prev',
-      nextIcon: 'media_next',
-      closeIcon: 'media_close',
-      notificationIcon: 'notification'
-    };
-    CapacitorMusicControls.create(options).then(res => {
-      console.log('CapacitorMusicControls.create - success: ', res);
-
-      CapacitorMusicControls.addListener('controlsNotification', (info: any) => {
-        console.log('controlsNotification was fired: ', info);
-        console.log('NgZone.isInAngularZone: ', NgZone.isInAngularZone());
-        this._ngZone.run(() => {
-          this.handleControlsEvent(info);
-        })
-      });
+    NativeAudio.getCurrentTime({
+      assetId: this.assetId,
+    }).then(res => {
+      console.log('getCurrentTime - success - res: ', res);
+      const currentTime = res.time;
+      const targetTime = currentTime - this.skipTime;
+      NativeAudio.setCurrentTime({
+        assetId: this.assetId,
+        time: targetTime,
+      }).then(() => {
+        console.log('setCurrentTime - success');
+      }).catch(err => {
+        console.log('setCurrentTime - err: ', err);
+      })
     }).catch(err => {
-      console.log('CapacitorMusicControls.create - err: ', err);
+      console.log('getCurrentTime - err: ', err);
     });
   }
 
-  startElapsedMonitor() {
-    if (this.elapsedInterval) {
-      clearInterval(this.elapsedInterval);
-    }
-    this.seek().then(elapsed => {
-      this.elapsed = elapsed;
-      this.updateControls();
+  initEventsListener() {
+    NativeAudio.addListener('playbackStateChanged', (info: { status: any; position: number }) => {
+      console.log('playbackStateChanged was fired: ', info);
+      console.log('NgZone.isInAngularZone: ', NgZone.isInAngularZone());
+      this._ngZone.run(() => {
+        // this.handleControlsEvent(info);
+        this.elapsed = info.position;
+        switch (info.status) {
+          case 'PLAYING':
+            this.isStarted = true;
+            this.isPlaying = true;
+            break;
+          case 'PAUSED':
+            this.isPlaying = false;
+            break;
+          case 'STOPPED':
+            this.isStarted = false;
+            this.isPlaying = false;
+            break;
+          case 'PLAYING':
+            this.isPlaying = true;
+            break;
+          case 'PLAYING':
+            this.isPlaying = true;
+            break;
+          default:
+            console.log(' /!\\ unhandled');
+            break;
+        }
+      })
     });
-    this.elapsedInterval = setInterval(() => {
-      this.seek().then(elapsed => {
-        this.elapsed = elapsed;
-        this.updateControls();
-      });
-    }, 1000);
   }
 
-  stopElapsedMonitor() {
-    if (this.elapsedInterval) {
-      clearInterval(this.elapsedInterval);
-    }
-  }
-
-  updateControls() {
-    CapacitorMusicControls.updateIsPlaying({
-      isPlaying: this.isPlaying, // affects Android only
-      elapsed: this.elapsed // affects iOS Only
-    });
-  }
-
-  handleControlsEvent(action) {
-
-    console.log("hello from handleControlsEvent")
-    const message = action.message;
-
-    console.log("message: " + message)
-
-    switch(message) {
-      case 'music-controls-next':
-        // next
-        break;
-      case 'music-controls-previous':
-        // previous
-        break;
-      case 'music-controls-pause':
-        // paused
-        this.pause();
-        break;
-      case 'music-controls-play':
-        // resumed
-        this.resume();
-        break;
-      case 'music-controls-destroy':
-        // controls were destroyed
-        this.stop();
-        break;
-
-        // External controls (iOS only)
-      case 'music-controls-toggle-play-pause' :
-        // do something
-        break;
-      case 'music-controls-skip-to':
-        // do something
-        break;
-      case 'music-controls-skip-forward':
-        // Do something
-        this.skipForward();
-        break;
-      case 'music-controls-skip-backward':
-        // Do something
-        this.skipBackward();
-        break;
-
-        // Headset events (Android only)
-        // All media button events are listed below
-      case 'music-controls-media-button' :
-        // Do something
-        break;
-      case 'music-controls-headset-unplugged':
-        // Do something
-        break;
-      case 'music-controls-headset-plugged':
-        // Do something
-        break;
-      default:
-        break;
-    }
-  }
 
 }

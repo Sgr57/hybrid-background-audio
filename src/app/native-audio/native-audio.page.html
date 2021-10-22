@@ -22,10 +22,10 @@
     </div>
     <div class="row">
       <div class="col">
-        <ion-button [disabled]="!isInitializated || isStarted" (click)="play()">PLAY</ion-button>
-        <ion-button [disabled]="!isInitializated || !isStarted" (click)="stop()">STOP</ion-button>
-        <ion-button [disabled]="!isInitializated || !isStarted || isPlaying" (click)="resume()">RESUME</ion-button>
+        <ion-button [disabled]="!isInitializated || isStarted" (click)="play()">START</ion-button>
+        <ion-button [disabled]="!isInitializated || !isStarted || isPlaying" (click)="resume()">PLAY</ion-button>
         <ion-button [disabled]="!isInitializated || !isStarted || !isPlaying" (click)="pause()">PAUSE</ion-button>
+        <ion-button [disabled]="!isInitializated || !isStarted" (click)="stop()">STOP</ion-button>
       </div>
     </div>
     <div class="row">
@@ -36,11 +36,17 @@
     </div>
     <div class="row">
       <div class="col">
-<!--        <ion-button (click)="seek()">SEEK</ion-button>-->
-<!--        <ion-button (click)="updateDuration()">DURATION</ion-button>-->
         <ion-button [disabled]="!isInitializated" (click)="skipForward()"> + {{this.skipTime}} </ion-button>
         <ion-button [disabled]="!isInitializated" (click)="skipBackward()"> - {{this.skipTime}} </ion-button>
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <div>
+          CURRENT TIME: {{this.elapsed}}
+        </div>
+      </div>
+    </div>
+
   </div>
 </ion-content>
