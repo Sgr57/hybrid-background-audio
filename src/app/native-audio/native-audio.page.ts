@@ -1,6 +1,6 @@
 import {Component, NgZone, OnInit} from '@angular/core';
 import {Platform} from "@ionic/angular";
-import {NativeAudio} from "@capacitor-community/native-audio";
+import {AdvancedNativeAudio} from "advanced-native-audio";
 
 @Component({
   selector: 'app-native-audio',
@@ -32,7 +32,7 @@ export class NativeAudioPage implements OnInit {
 
   startRemote() {
     if (this.platform.is('cordova')) {
-      NativeAudio.preload({
+      AdvancedNativeAudio.preload({
         assetId: this.assetId,
         assetPath: this.audioUrlRemote,
         isUrl: true,
@@ -50,7 +50,7 @@ export class NativeAudioPage implements OnInit {
 
   start() {
     if (this.platform.is('cordova')) {
-      NativeAudio.preload({
+      AdvancedNativeAudio.preload({
         assetId: this.assetId,
         assetPath: this.audioUrl,
         isUrl: false,
@@ -67,7 +67,7 @@ export class NativeAudioPage implements OnInit {
   }
 
   async play(time: number = 0.0) {
-    NativeAudio.play({
+    AdvancedNativeAudio.play({
       assetId: this.assetId,
       time
     }).then(() => {
@@ -80,7 +80,7 @@ export class NativeAudioPage implements OnInit {
   }
 
   pause() {
-    NativeAudio.pause({
+    AdvancedNativeAudio.pause({
       assetId: this.assetId,
     }).then(() => {
       console.log('pause - success');
@@ -91,7 +91,7 @@ export class NativeAudioPage implements OnInit {
   }
 
   resume() {
-    NativeAudio.resume({
+    AdvancedNativeAudio.resume({
       assetId: this.assetId,
     }).then(() => {
       console.log('resume - success');
@@ -102,7 +102,7 @@ export class NativeAudioPage implements OnInit {
   }
 
   stop() {
-    NativeAudio.stop({
+    AdvancedNativeAudio.stop({
       assetId: this.assetId,
     }).then(() => {
       console.log('stop - success');
@@ -114,11 +114,11 @@ export class NativeAudioPage implements OnInit {
   }
 
   volumeUp() {
-    NativeAudio.getVolume({ assetId: this.assetId}).then((res) => {
+    AdvancedNativeAudio.getVolume({ assetId: this.assetId}).then((res) => {
       console.log('getVolume - success - res: ', res);
       const currentVolume = res.volume;
       const targetVolume = currentVolume + 0.1;
-      NativeAudio.setVolume({
+      AdvancedNativeAudio.setVolume({
         assetId: this.assetId,
         volume: targetVolume
       }).then(() => {
@@ -132,11 +132,11 @@ export class NativeAudioPage implements OnInit {
   }
 
   volumeDown() {
-    NativeAudio.getVolume({ assetId: this.assetId}).then((res) => {
+    AdvancedNativeAudio.getVolume({ assetId: this.assetId}).then((res) => {
       console.log('getVolume - success - res: ', res);
       const currentVolume = res.volume;
       const targetVolume = currentVolume - 0.1;
-      NativeAudio.setVolume({
+      AdvancedNativeAudio.setVolume({
         assetId: this.assetId,
         volume: targetVolume
       }).then(() => {
@@ -150,7 +150,7 @@ export class NativeAudioPage implements OnInit {
   }
 
   currentTime() {
-    return NativeAudio.getCurrentTime({
+    return AdvancedNativeAudio.getCurrentTime({
       assetId: this.assetId,
     }).then(res => {
       console.log('getCurrentTime - success - res: ', res);
@@ -162,7 +162,7 @@ export class NativeAudioPage implements OnInit {
   }
 
   updateDuration() {
-    return NativeAudio.getDuration({
+    return AdvancedNativeAudio.getDuration({
       assetId: this.assetId,
     }).then(result => {
       console.log('duration: ', result.duration);
@@ -172,13 +172,13 @@ export class NativeAudioPage implements OnInit {
   }
 
   skipForward() {
-    NativeAudio.getCurrentTime({
+    AdvancedNativeAudio.getCurrentTime({
       assetId: this.assetId,
     }).then(res => {
       console.log('getCurrentTime - success - res: ', res);
       const currentTime = res.time;
       const targetTime = currentTime + this.skipTime;
-      NativeAudio.setCurrentTime({
+      AdvancedNativeAudio.setCurrentTime({
         assetId: this.assetId,
         time: targetTime,
       }).then(() => {
@@ -192,13 +192,13 @@ export class NativeAudioPage implements OnInit {
   }
 
   skipBackward() {
-    NativeAudio.getCurrentTime({
+    AdvancedNativeAudio.getCurrentTime({
       assetId: this.assetId,
     }).then(res => {
       console.log('getCurrentTime - success - res: ', res);
       const currentTime = res.time;
       const targetTime = currentTime - this.skipTime;
-      NativeAudio.setCurrentTime({
+      AdvancedNativeAudio.setCurrentTime({
         assetId: this.assetId,
         time: targetTime,
       }).then(() => {
@@ -212,7 +212,7 @@ export class NativeAudioPage implements OnInit {
   }
 
   initEventsListener() {
-    NativeAudio.addListener('playbackStateChanged', (info: { status: any; position: number }) => {
+    AdvancedNativeAudio.addListener('playbackStateChanged', (info: { status: any; position: number }) => {
       console.log('playbackStateChanged was fired: ', info);
       console.log('NgZone.isInAngularZone: ', NgZone.isInAngularZone());
       this._ngZone.run(() => {
@@ -229,12 +229,6 @@ export class NativeAudioPage implements OnInit {
           case 'STOPPED':
             this.isStarted = false;
             this.isPlaying = false;
-            break;
-          case 'PLAYING':
-            this.isPlaying = true;
-            break;
-          case 'PLAYING':
-            this.isPlaying = true;
             break;
           default:
             console.log(' /!\\ unhandled');
