@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Howl, Howler} from 'howler';
-import {NativeAudio} from '@capacitor-community/native-audio'
 import {Platform} from "@ionic/angular";
+import {AdvancedNativeAudio} from "advanced-native-audio";
 
 @Component({
   selector: 'app-home',
@@ -24,10 +24,11 @@ export class HomePage implements OnInit {
 
   start() {
     if (this.platform.is('cordova')) {
-      NativeAudio.preload({
+      AdvancedNativeAudio.preload({
         assetId: "ukulele",
         assetPath: this.audioUrl,
         audioChannelNum: 1,
+        trackName: "Ukulele",
         isUrl: true
       });
     } else {
@@ -83,7 +84,7 @@ export class HomePage implements OnInit {
 
   play() {
     if (this.platform.is('cordova')) {
-      NativeAudio.play({
+      AdvancedNativeAudio.play({
         assetId: 'ukulele',
         time: 0.0
       });
